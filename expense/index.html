@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none'; base-uri 'none';">
+    <title>個人経費管理システム</title>
+    <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+    <header class="app-bar">
+        <h1>個人経費管理システム</h1>
+        <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+            <button class="manual-btn no-print" onclick="showManual()">使い方</button>
+            <nav class="appbar-nav no-print">
+                <a href="#entry-card">支出登録</a>
+                <a href="#unpaid-card">未精算明細</a>
+                <a href="#history-card">精算履歴</a>
+                <a href="#data-card">データ保存</a>
+            </nav>
+            <div class="appbar-unpaid"><span class="appbar-label">未精算合計</span><span id="appbar-unpaid-sum">￥0-</span></div>
+        </div>
+    </header>
+    <div class="container">
+        <div class="card" id="entry-card">
+        <div class="card-title-row">
+            <h3 class="card-title">支出登録</h3>
+            <div class="print-date-box no-print">
+                <label style="display:flex; align-items:center; gap:10px; margin-bottom:0;">
+                    <input type="checkbox" id="print-date-manual" style="transform:scale(1.2); margin:0;">
+                    申請日・作成日を手動で指定
+                </label>
+                <input id="print-date" type="date" style="display:none;">
+            </div>
+        </div>
+
+        <details class="collapsible-section no-print" id="print-info-details">
+            <summary>🖨 印刷用情報（社員ID・氏名）を記入する（任意・保存されません）</summary>
+            <div class="collapsible-section-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label style="display:flex; align-items:center; gap:10px; font-weight:normal; flex-wrap:wrap; margin-bottom:8px;">
+                            <input type="checkbox" id="print-empid-toggle" style="transform:scale(1.2); margin:0;">
+                            社員IDを記入する
+                        </label>
+                        <input id="print-empid" placeholder="例: 12345" maxlength="30" style="display:none;">
+                    </div>
+                    <div class="form-group">
+                        <label style="display:flex; align-items:center; gap:10px; font-weight:normal; flex-wrap:wrap; margin-bottom:8px;">
+                            <input type="checkbox" id="print-name-toggle" style="transform:scale(1.2); margin:0;">
+                            氏名を記入する
+                        </label>
+                        <input id="print-name" placeholder="例: 山田太郎" maxlength="30" style="display:none;">
+                    </div>
+                    <div class="form-group">
+                        <label for="print-sort-order">帳票の並び順</label>
+                        <select id="print-sort-order">
+                            <option value="date-desc">日付（降順・新しい順）</option>
+                            <option value="date-asc">日付（昇順・古い順）</option>
+                            <option value="shop-asc">利用先名（アスキーコード順）</option>
+                            <option value="date-shop-asc">日付→利用先名（アスキーコード順）</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </details>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="date">日付</label>
+                <input id="date" type="date">
+                <div class="field-error" id="err-date"></div>
+            </div>
+            <div class="form-group">
+                <label for="shop">利用先</label>
+                <div class="shop-input-row">
+                    <input id="shop" placeholder="例: スーパーA" maxlength="100" list="shop-suggest" autocomplete="off">
+                    <button type="button" id="save-shop-btn" class="btn-save-shop">★ 常用登録</button>
+                </div>
+                <datalist id="shop-suggest"></datalist>
+                <div class="chip-row" id="saved-shops-chips"></div>
+                <div class="field-error" id="err-shop"></div>
+            </div>
+            <div class="form-group">
+                <label for="amount">金額</label>
+                <input id="amount" type="text" inputmode="numeric" placeholder="0">
+                <div class="field-error" id="err-amount"></div>
+            </div>
+            <div class="form-group">
+                <label for="memo">摘要</label>
+                <input id="memo" placeholder="任意" maxlength="200">
+            </div>
+            <div class="form-group">
+                <label for="payment">支払方法</label>
+                <select id="payment">
+                    <option value="">（未選択）</option>
+                    <option value="現金">現金</option>
+                    <option value="クレジットカード">クレジットカード</option>
+                    <option value="PayPay">PayPay</option>
+                    <option value="楽天ペイ">楽天ペイ</option>
+                    <option value="d払い">d払い</option>
+                    <option value="au PAY">au PAY</option>
+                    <option value="交通系IC">交通系IC</option>
+                    <option value="その他Pay">その他Pay</option>
+                    <option value="オンライン決済">オンライン決済</option>
+                </select>
+                <div class="field-error" id="err-payment"></div>
+            </div>
+            <div class="form-group">
+                <label for="tax-rate">税率</label>
+                <select id="tax-rate">
+                    <option value="">（未分類）</option>
+                    <option value="10">10%</option>
+                    <option value="8">8%</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="invoice">インボイス登録番号</label>
+                <input id="invoice" placeholder="例: 1234567890123（先頭Tは不要）" maxlength="20">
+                <div class="field-error" id="err-invoice"></div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group" style="flex: 0 0 100%;">
+                <label class="split-toggle-bar" id="split-toggle-bar">
+                    <span class="split-toggle-text">
+                        <span class="split-toggle-title">税率を分割して入力</span>
+                        <span class="split-toggle-desc">1枚のレシートに8%と10%が併記されているとき（例：ドラッグストアで食料品＋日用品）</span>
+                    </span>
+                    <span class="switch">
+                        <input type="checkbox" id="split-toggle">
+                        <span class="slider"></span>
+                        <span class="switch-state" id="split-toggle-state">OFF</span>
+                    </span>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-row" id="split-panel" style="display:none; border-left: 4px solid #ddd; margin-left: 10px; padding-left: 15px;">
+            <div class="form-group">
+                <label for="split-10">├ 10%対象額</label>
+                <input id="split-10" type="text" inputmode="numeric" placeholder="0">
+            </div>
+            <div class="form-group">
+                <label for="split-8">├ 8%対象額</label>
+                <input id="split-8" type="text" inputmode="numeric" placeholder="0">
+            </div>
+            <div class="form-group">
+                <label for="split-none">└ 非課税・未分類額</label>
+                <input id="split-none" type="text" inputmode="numeric" placeholder="0">
+            </div>
+            <div class="form-group">
+                <label>── 金額（自動計算）</label>
+                <div id="split-total" style="padding:8px 0; font-weight:bold;">￥0-</div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="items">内訳メモ（任意・1行1項目・計算には使用しません）</label>
+                <!-- maxlength: MAX_ITEMS(20件) × (MAX_ITEM_LENGTH(100文字) + 改行1文字) = 2020 -->
+                <textarea id="items" rows="3" placeholder="例：&#10;コーヒー&#10;サンドイッチ&#10;雑誌" maxlength="2020"></textarea>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group" style="flex: 0 0 100%;">
+                <label style="display:flex; align-items:center; gap:10px; font-weight:normal; font-size:16px; flex-wrap:wrap; margin-bottom:0;">
+                    <input type="checkbox" id="settle-name-toggle" style="transform:scale(1.2); margin:0;">
+                    精算名を指定（任意・例：5月分）→ 自動で連番付与
+                    <input type="text" id="settle-name" placeholder="例: 5月分" maxlength="30" style="display:none; flex:1; min-width:150px; font-size:16px; padding:6px 10px;">
+                </label>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button id="add-entry-btn" class="btn-reg">支出登録</button>
+            <button id="settle-all-btn" class="btn-settle">一括精算</button>
+        </div>
+
+        <div id="edit-mode-indicator" style="display:none;">
+            <span>編集中：<span id="edit-mode-target"></span></span>
+            <button id="cancel-edit-btn" class="btn-sub">編集キャンセル</button>
+        </div>
+        </div>
+
+        <!-- 未精算明細 -->
+        <div class="card" id="unpaid-card">
+        <div class="print-only print-document">
+            <div class="print-doc-header">
+                <h1>経費精算明細書</h1>
+            </div>
+            <div class="print-summary-row">
+                <span class="print-field-empid">社員ID：<span class="print-empid-val print-blank"></span></span>
+                <span class="print-field-name">氏名：<span class="print-name-val print-blank"></span></span>
+            </div>
+            <div class="print-doc-meta">
+                <div>申請日：<span class="print-doc-date"></span></div>
+                <div>対象件数：<span id="unpaid-print-count"></span> 件</div>
+            </div>
+            <table class="print-table compact">
+                <thead>
+                    <tr><th>日付</th><th>利用先</th><th>摘要</th><th>支払方法</th><th>税率</th><th class="num">金額（円）</th></tr>
+                </thead>
+                <tbody id="unpaid-print-list"></tbody>
+                <tfoot>
+                    <tr><td colspan="5">合計</td><td class="num" id="unpaid-print-total"></td></tr>
+                </tfoot>
+            </table>
+        </div>
+        <h2>
+            <span class="h2-actions">
+                <span class="h2-title">未精算明細
+                <details class="help-details">
+                    <summary class="help-icon" aria-label="補足説明">?</summary>
+                    <div class="help-content">
+                        <ul class="help-list">
+                            <li>・表内の金額の単位：円</li>
+                            <li>・税額は切り捨てで算出した参考値</li>
+                        </ul>
+                        <div class="help-close">close</div>
+                    </div>
+                </details>
+                </span>
+                <span class="h2-btn-row">
+                <button class="btn-sub no-print print-section-btn" data-target="unpaid" style="margin-left:10px;">明細印刷</button>
+                <details class="help-details">
+                    <summary class="help-icon" aria-label="印刷時のヘッダー・フッターについて">！</summary>
+                    <div class="help-content">
+                        <ul class="help-list">
+                            <li>・印刷日時やURLが上下に表示される場合あり</li>
+                            <li>・印刷ダイアログの「詳細設定」を開く</li>
+                            <li>・「ヘッダーとフッター」のチェックを外すと非表示</li>
+                        </ul>
+                        <div class="help-close">close</div>
+                    </div>
+                </details>
+                </span>
+                <span class="h2-btn-row">
+                <button class="btn-sub no-print excel-export-btn" data-kind="unpaid" style="background-color:#217346; margin-left:10px;">Excel出力</button>
+                </span>
+            </span>
+            <div style="text-align: right;">
+                <div>未精算合計: <span id="unpaid-sum-display" class="unpaid-total">0</span></div>
+                <div style="font-size: 18px; font-weight: normal; color: #666; margin-top: 5px;">
+                    対象件数: <span id="unpaid-count-display">0</span> 件
+                    <details class="help-details">
+                        <summary class="help-icon" aria-label="税率別の内訳">?</summary>
+                        <div class="help-content">
+                            <ul class="help-list">
+                                <li>・10%対象 <span id="tax10-sum-display">0</span>（税額 <span id="tax10-tax-display">0</span>）</li>
+                                <li>・8%対象 <span id="tax8-sum-display">0</span>（税額 <span id="tax8-tax-display">0</span>）</li>
+                                <li>・未分類 <span id="tax-none-sum-display">0</span></li>
+                            </ul>
+                            <div class="help-close">close</div>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </h2>
+
+        <!-- 未精算明細 絞り込みバー（折りたたみ・2カラム：キーワード｜期間） -->
+        <details class="collapsible-section no-print" id="unpaid-filter-details">
+            <summary>🔍 明細を検索・絞り込み（クリックで開く）</summary>
+            <div class="collapsible-section-body">
+                <div class="filter-grid" id="unpaid-filter-bar">
+                    <div class="filter-col filter-col-kw">
+                        <span class="filter-label">キーワード</span>
+                        <div class="kw-input-row">
+                            <input type="text" id="unpaid-filter-kw" placeholder="利用先・摘要・内訳">
+                            <button type="button" class="btn-save-kw" data-target="unpaid-filter-kw">★ 登録</button>
+                        </div>
+                        <div class="chip-row kw-chips" id="unpaid-kw-chips"></div>
+                    </div>
+                    <div class="filter-col filter-col-period">
+                        <span class="filter-label">期間</span>
+                        <div class="filter-period-row">
+                            <input type="date" id="unpaid-filter-from">
+                            <span>〜</span>
+                            <input type="date" id="unpaid-filter-to">
+                        </div>
+                        <button class="btn-filter-clear" id="unpaid-filter-clear">クリア</button>
+                    </div>
+                </div>
+                <div class="filter-count" id="unpaid-filter-count" style="display:none; margin-top:6px;"></div>
+                <div id="unpaid-settle-note" class="filter-settle-note" style="display:none; margin-top:6px;">※ 絞り込み中でも「一括精算」は全未精算が対象です</div>
+            </div>
+        </details>
+
+        <div class="select-actions" id="selection-bar" style="display: none;">
+            <span style="font-weight: bold; color: #c05d00;">
+                <span id="selected-count">0</span> 件選択中
+                (選択合計: <span id="selected-sum-display">0</span>)
+            </span>
+            <button id="settle-selected-btn" class="btn-settle" style="padding: 10px 25px; font-size: 18px;">選択項目を精算</button>
+            <button id="delete-selected-btn" class="btn-del">選択項目消去</button>
+        </div>
+
+        <div class="scroll-hint">→ 表は横にスクロールできます</div>
+        <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 60px; text-align: center;"><input type="checkbox" id="select-all"></th>
+                    <th>日付</th>
+                    <th>利用先</th>
+                    <th style="width: 250px;">金額</th>
+                    <th>摘要</th>
+                    <th>支払方法</th>
+                    <th>税率</th>
+                    <th style="width: 100px;">操作</th>
+                </tr>
+            </thead>
+            <tbody id="unpaid-list"></tbody>
+        </table>
+        </div>
+        </div>
+
+        <!-- 精算履歴 -->
+        <div class="card" id="history-card">
+        <div class="print-only print-document">
+            <div class="print-doc-header">
+                <h1>精算履歴一覧</h1>
+            </div>
+            <div class="print-summary-row">
+                <span class="print-field-empid">社員ID：<span class="print-empid-val print-blank"></span></span>
+                <span class="print-field-name">氏名：<span class="print-name-val print-blank"></span></span>
+            </div>
+            <div class="print-doc-meta">
+                <div>作成日：<span class="print-doc-date"></span></div>
+                <div>件数：<span id="history-print-count"></span> 回</div>
+            </div>
+            <table class="print-table">
+                <thead>
+                    <tr><th>精算日</th><th>精算ID</th><th class="num">明細件数</th><th class="num">合計金額（円）</th></tr>
+                </thead>
+                <tbody id="history-print-list"></tbody>
+            </table>
+        </div>
+        <h2>
+            <span class="h2-actions">
+                <span class="h2-title">精算履歴
+                <details class="help-details">
+                    <summary class="help-icon" aria-label="補足説明">?</summary>
+                    <div class="help-content">
+                        <ul class="help-list">
+                            <li>・表内の金額の単位：円</li>
+                            <li>・精算IDをクリックすると、その精算の明細一覧が表示されます</li>
+                        </ul>
+                        <div class="help-close">close</div>
+                    </div>
+                </details>
+                </span>
+                <span class="h2-btn-row">
+                <button class="btn-sub no-print print-section-btn" data-target="history" style="margin-left:10px;">履歴印刷</button>
+                <details class="help-details">
+                    <summary class="help-icon" aria-label="印刷時のヘッダー・フッターについて">！</summary>
+                    <div class="help-content">
+                        <ul class="help-list">
+                            <li>・印刷日時やURLが上下に表示される場合あり</li>
+                            <li>・印刷ダイアログの「詳細設定」を開く</li>
+                            <li>・「ヘッダーとフッター」のチェックを外すと非表示</li>
+                        </ul>
+                        <div class="help-close">close</div>
+                    </div>
+                </details>
+                <details class="help-details formal">
+                    <summary class="help-icon" aria-label="印刷／PDF保存について">?</summary>
+                    <div class="help-content">
+                        <div class="help-title" style="font-weight:bold; margin-bottom:6px;">印刷／PDF保存について</div>
+                        <ul class="help-list">
+                            <li>・経費精算書（提出用）は精算履歴の精算IDをクリック</li>
+                            <li>・開いた「精算内訳」画面の「印刷／PDF保存」で出力</li>
+                        </ul>
+                        <div class="help-close">close</div>
+                    </div>
+                </details>
+                </span>
+                <span class="h2-btn-row">
+                <button class="btn-sub no-print excel-export-btn" data-kind="history" style="background-color:#217346; margin-left:10px;">Excel出力</button>
+                </span>
+            </span>
+            <span style="font-size: 18px; color: #666; font-weight: normal;">
+                (全 <span id="history-count-display">0</span> 回 / 精算済明細 <span id="settled-item-count-display">0</span> 件)
+            </span>
+        </h2>
+
+        <!-- 精算履歴 絞り込みバー（折りたたみ・2カラム：キーワード｜期間） -->
+        <details class="collapsible-section no-print" id="history-filter-details">
+            <summary>🔍 精算履歴を検索・絞り込み（クリックで開く）</summary>
+            <div class="collapsible-section-body">
+                <div class="filter-grid" id="history-filter-bar">
+                    <div class="filter-col filter-col-kw">
+                        <span class="filter-label">キーワード</span>
+                        <div class="kw-input-row">
+                            <input type="text" id="history-filter-kw" placeholder="精算ID・精算名">
+                            <button type="button" class="btn-save-kw" data-target="history-filter-kw">★ 登録</button>
+                        </div>
+                        <div class="chip-row kw-chips" id="history-kw-chips"></div>
+                    </div>
+                    <div class="filter-col filter-col-period">
+                        <span class="filter-label">期間</span>
+                        <div class="filter-period-row">
+                            <input type="date" id="history-filter-from">
+                            <span>〜</span>
+                            <input type="date" id="history-filter-to">
+                        </div>
+                        <button class="btn-filter-clear" id="history-filter-clear">クリア</button>
+                    </div>
+                </div>
+                <div class="filter-count" id="history-filter-count" style="display:none; margin-top:6px;"></div>
+            </div>
+        </details>
+
+        <div id="history-limit-note" style="display:none; font-size: 14px; color: #999; margin-top: -10px; margin-bottom: 10px;">
+            ※ 直近10件のみ表示しています（全件はバックアップJSONに保持されます）
+        </div>
+        <div class="scroll-hint">→ 表は横にスクロールできます</div>
+        <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>精算日</th>
+                    <th>精算ID</th>
+                    <th style="width: 250px;">合計金額</th>
+                </tr>
+            </thead>
+            <tbody id="history-list"></tbody>
+        </table>
+        </div>
+        </div>
+
+        <!-- 孤児明細：精算済だが対応する精算履歴が見つからない明細（主にJSON統合時に発生） -->
+        <div class="card warning-card" id="orphan-card" style="display:none;">
+        <h2 id="orphan-section" style="display:none; color: var(--warn-color); border-left-color: var(--warn-color);">
+            ⚠ 確認が必要な明細（孤児明細）
+            <span style="font-size: 18px; color: var(--warn-color); font-weight: normal;">
+                <span id="orphan-count-display">0</span> 件
+            </span>
+        </h2>
+        <div id="orphan-note" style="display:none; font-size: 14px; color: #78350f; margin-top: -10px; margin-bottom: 10px;">
+            ※ データ統合などで発生した、参照先の精算履歴が存在しない明細です。内容を確認し「未精算に戻す」または「削除」してください。
+        </div>
+        <div id="orphan-scroll-hint" class="scroll-hint" style="display:none;">→ 表は横にスクロールできます</div>
+        <div class="table-wrapper">
+        <table id="orphan-table" style="display:none;">
+            <thead>
+                <tr>
+                    <th>日付</th>
+                    <th>利用先</th>
+                    <th style="width: 200px;">金額</th>
+                    <th>摘要</th>
+                    <th>精算ID</th>
+                    <th style="width: 200px;">操作</th>
+                </tr>
+            </thead>
+            <tbody id="orphan-list"></tbody>
+        </table>
+        </div>
+        </div>
+
+        <div class="card" id="data-card">
+        <h3 class="card-title" style="margin:0 0 14px;">データ保存</h3>
+
+        <div id="autosave-status-bar" class="autosave-status-bar no-print">
+            <span id="autosave-status-text">フォルダへの自動保存：未設定</span>
+            <button id="autosave-setup-btn" class="btn-sub">フォルダへの自動保存を設定</button>
+            <button id="autosave-resume-btn" class="btn-sub" style="display:none;">保存を再開（許可）</button>
+            <button id="autosave-disable-btn" class="btn-sub" style="display:none; background:#9ca3af;">自動保存を解除</button>
+        </div>
+        <details class="collapsible-section no-print" id="autosave-settings-details" style="display:none;">
+            <summary>⚙ 自動保存の設定（保存間隔・保持件数）</summary>
+            <div class="collapsible-section-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="autosave-interval-select">保存間隔</label>
+                        <select id="autosave-interval-select">
+                            <option value="60000">1分</option>
+                            <option value="300000" selected>5分</option>
+                            <option value="600000">10分</option>
+                            <option value="1800000">30分</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="autosave-keep-select">保持件数（古い世代から自動削除）</label>
+                        <select id="autosave-keep-select">
+                            <option value="5">5件</option>
+                            <option value="10" selected>10件</option>
+                            <option value="20">20件</option>
+                            <option value="50">50件</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </details>
+
+        <div class="footer-head">
+            <a href="#" id="feedback-link">ご意見・ご要望</a>
+        </div>
+        <div class="footer-groups">
+            <div>
+                <div class="footer-group-label">Excelで集計・管理したい方</div>
+                <div class="footer-tools">
+                    <button id="export-csv-btn" class="btn-sub" style="background-color: #217346;">CSV出力 (Excel用)</button>
+                    <button id="import-csv-btn" class="btn-sub" style="background-color: #217346;">CSV読込（明細を追加）</button>
+                </div>
+            </div>
+            <div>
+                <div class="footer-group-label">データを保存・復元したい方（バックアップ）</div>
+                <div class="footer-tools">
+                    <button id="export-data-btn" class="btn-sub">データ保存（バックアップ）</button>
+                    <button id="import-data-btn" class="btn-sub">データ読込</button>
+                </div>
+            </div>
+            <div>
+                <div class="footer-group-label">複数のバックアップを整理・統合したい方</div>
+                <div class="footer-tools">
+                    <button id="merge-data-btn" class="btn-sub">バックアップ統合</button>
+                    <button id="backup-manage-btn" class="btn-sub">自動保存管理</button>
+                    <button id="review-files-btn" class="btn-sub">保存ファイル整理</button>
+                </div>
+            </div>
+            <div>
+                <div class="footer-group-label">全データを消去したい方（取り消し不可）</div>
+                <div class="footer-tools">
+                    <button id="clear-all-btn" class="btn-sub" style="background-color: var(--del-color);">全データ消去</button>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <div id="modal">
+        <div class="modal-content">
+            <span class="close-btn">close</span>
+            <h2 id="modal-title" style="margin-top: 0; border: none;">精算内訳</h2>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- フォルダへの自動保存：保存先フォルダ案内（ブロッキング型・専用ボタンのみで離脱） -->
+    <div id="autosave-folder-guide" role="dialog" aria-modal="true" aria-labelledby="autosave-folder-guide-title">
+        <div class="modal-content">
+            <h2 id="autosave-folder-guide-title" style="margin-top: 0; border: none;">保存先フォルダの指定</h2>
+            <p class="guide-warn">
+                このアプリは、選択したフォルダ内に保存データを作成します。<br>
+                既存の業務フォルダや他システム用フォルダを選ばないでください。
+            </p>
+            <p style="font-weight: bold; margin: 0 0 6px;">推奨操作：</p>
+            <ol class="guide-steps">
+                <li>ドキュメントを開く</li>
+                <li>「経費管理_保存用」フォルダを新規作成する</li>
+                <li>作成したフォルダだけを選択する</li>
+            </ol>
+            <label class="guide-check-row">
+                <input type="checkbox" id="autosave-guide-check-created">
+                <span>新しい専用フォルダを作成しました</span>
+            </label>
+            <label class="guide-check-row">
+                <input type="checkbox" id="autosave-guide-check-confirmed">
+                <span>既存の業務フォルダを選ばないことを確認しました</span>
+            </label>
+            <div class="guide-actions">
+                <button type="button" class="btn-guide-cancel" id="autosave-guide-cancel-btn">キャンセル</button>
+                <button type="button" class="btn-guide-proceed" id="autosave-guide-proceed-btn" disabled>フォルダ選択へ進む</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 印刷ページ割りの計測専用領域（画面には表示しない・実体と同じ幅でレイアウトを計測） -->
+    <div id="print-measure"></div>
+
+    <script src="assets/autosave-utils.js"></script>
+    <script src="assets/app.js"></script>
+</body>
+</html>

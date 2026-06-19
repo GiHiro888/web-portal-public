@@ -1,0 +1,122 @@
+:root {
+    --main-color: #4f46e5;
+    --main-hover: #4338ca;
+    --sub-color: #059669;
+    --bg-color: #f1f5f9;
+    --card-bg: #ffffff;
+    --border: #e2e8f0;
+    --text: #0f172a;
+    --muted: #64748b;
+    --accent-tint: #eef2ff;
+    --badge-live-bg: #ecfdf5;
+    --badge-live-text: #047857;
+    --badge-dev-bg: #f1f5f9;
+    --badge-dev-text: #475569;
+}
+* { box-sizing: border-box; }
+body {
+    font-family: system-ui, -apple-system, "Segoe UI", "Meiryo", sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color);
+    color: var(--text);
+    font-size: 18px;
+}
+
+.portal-bar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.portal-bar h1 { font-size: 24px; margin: 0; color: var(--text); }
+.portal-bar .updated { font-size: 14px; color: var(--muted); white-space: nowrap; }
+
+.container { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+
+.app-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    gap: 24px;
+}
+
+.app-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+.app-card-main { flex: 1; min-width: 0; }
+.app-card-icon { font-size: 32px; line-height: 1; margin-bottom: 8px; }
+.app-card-title { font-size: 22px; font-weight: bold; margin: 0 0 8px; color: var(--text); }
+.app-card-desc { font-size: 15px; color: var(--muted); margin: 0 0 20px; line-height: 1.6; }
+.app-card-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.btn-primary, .btn-secondary {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: bold;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+}
+.btn-primary { background: var(--main-color); color: #fff; }
+.btn-primary:hover { background: var(--main-hover); }
+.btn-secondary { background: var(--accent-tint); color: var(--main-color); }
+.btn-secondary:hover { background: #c7d2fe; }
+
+.app-card-meta {
+    flex: 0 0 140px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    text-align: right;
+}
+.version-tag {
+    font-size: 13px;
+    color: var(--muted);
+    background: var(--bg-color);
+    padding: 3px 10px;
+    border-radius: 999px;
+}
+.badge {
+    font-size: 13px;
+    font-weight: bold;
+    padding: 3px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+.badge-live { background: var(--badge-live-bg); color: var(--badge-live-text); }
+.badge-dev { background: var(--badge-dev-bg); color: var(--badge-dev-text); }
+
+.app-grid-empty {
+    border: 1px dashed var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    color: var(--muted);
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+@media (max-width: 480px) {
+    .app-card { flex-direction: column; }
+    .app-card-meta { flex-direction: row; align-items: center; justify-content: flex-start; }
+}
