@@ -39,6 +39,8 @@ body {
 }
 .portal-bar h1 { font-size: 24px; margin: 0; color: var(--text); }
 .portal-bar .updated { font-size: 14px; color: var(--muted); white-space: nowrap; }
+.brand h1 { margin: 0; }
+.tagline { font-size: 13px; color: var(--muted); margin: 2px 0 0; }
 
 .container { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
 
@@ -63,6 +65,13 @@ body {
 .app-card-title { font-size: 22px; font-weight: bold; margin: 0 0 8px; color: var(--text); }
 .app-card-desc { font-size: 15px; color: var(--muted); margin: 0 0 20px; line-height: 1.6; }
 .app-card-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.app-card-desc-toggle { margin: 0 0 20px; }
+.app-card-desc-toggle > summary { cursor: pointer; font-size: 15px; font-weight: bold; color: var(--main-color); list-style: none; display: inline-flex; align-items: center; gap: 6px; }
+.app-card-desc-toggle > summary::-webkit-details-marker { display: none; }
+.app-card-desc-toggle > summary::before { content: "▸"; font-size: 12px; }
+.app-card-desc-toggle[open] > summary::before { content: "▾"; }
+.app-card-desc-toggle p { font-size: 15px; color: var(--muted); margin: 10px 0 0; line-height: 1.6; }
 
 .btn-primary, .btn-secondary {
     display: inline-block;
@@ -120,3 +129,15 @@ body {
     .app-card { flex-direction: column; }
     .app-card-meta { flex-direction: row; align-items: center; justify-content: flex-start; }
 }
+
+.portal-footer {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px 32px;
+}
+.domain-trivia { font-size: 13px; color: var(--muted); }
+.domain-trivia > summary { cursor: pointer; font-weight: bold; color: var(--main-color); list-style: none; display: inline-flex; align-items: center; gap: 6px; }
+.domain-trivia > summary::-webkit-details-marker { display: none; }
+.domain-trivia > summary::before { content: "▸"; font-size: 12px; }
+.domain-trivia[open] > summary::before { content: "▾"; }
+.domain-trivia p { margin: 8px 0 0; line-height: 1.6; }

@@ -9,9 +9,13 @@
 </head>
 <body>
     <header class="app-bar">
-        <h1>個人経費管理システム</h1>
+        <div class="appbar-left">
+            <a class="appbar-home no-print" href="../index.html" title="ツール一覧へ戻る">← ツール一覧へ</a>
+            <h1>個人経費管理システム</h1>
+        </div>
         <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
             <button class="manual-btn no-print" onclick="showManual()">使い方</button>
+            <a href="#" id="feedback-link" class="feedback-link no-print">ご意見・ご要望</a>
             <nav class="appbar-nav no-print">
                 <a href="#entry-card">支出登録</a>
                 <a href="#unpaid-card">未精算明細</a>
@@ -495,9 +499,6 @@
             </div>
         </details>
 
-        <div class="footer-head">
-            <a href="#" id="feedback-link">ご意見・ご要望</a>
-        </div>
         <div class="footer-groups">
             <div>
                 <div class="footer-group-label">Excelで集計・管理したい方</div>
@@ -528,6 +529,12 @@
                 </div>
             </div>
         </div>
+        </div>
+
+        <div class="card card-upcoming no-print" id="linked-tools-card" aria-disabled="true">
+            <h3 class="card-title">連携ツール <span class="upcoming-badge">予定機能</span></h3>
+            <p class="upcoming-desc">今後、一緒に使える他ツールへのリンクをここに登録できるようになります。（実装予定）</p>
+            <div class="upcoming-placeholder">＋ ツールを登録（準備中）</div>
         </div>
     </div>
 

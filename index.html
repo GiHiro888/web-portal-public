@@ -4,13 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'none'; object-src 'none'; base-uri 'none';">
-    <title>マイツールズ</title>
+    <title>taskhum.cc｜ブラウザで完結する個人向け無料ツールハブ</title>
+    <meta name="description" content="経費管理など、インストール不要・ブラウザだけで使える個人向けツールをまとめた無料ツールハブ「taskhum.cc」。">
+    <link rel="canonical" href="https://taskhum.cc/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="taskhum.cc｜ブラウザで完結する個人向け無料ツールハブ">
+    <meta property="og:description" content="経費管理など、インストール不要・ブラウザだけで使える個人向けツールをまとめた無料ツールハブ「taskhum.cc」。">
+    <meta property="og:url" content="https://taskhum.cc/">
     <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
     <header class="portal-bar">
-        <h1>マイツールズ</h1>
-        <span class="updated">最終更新: 2026-06-19</span>
+        <div class="brand">
+            <h1>taskhum.cc</h1>
+            <p class="tagline">毎日のタスクを、軽やかに。</p>
+        </div>
+        <span class="updated">最終更新: 2026-06-21</span>
     </header>
 
     <main class="container">
@@ -19,22 +28,29 @@
                 <div class="app-card-main">
                     <div class="app-card-icon">💰</div>
                     <h2 class="app-card-title">個人経費管理システム</h2>
-                    <p class="app-card-desc">
-                        支出登録・精算・帳票印刷・Excel出力・自動保存に対応した経費管理ツール。
-                    </p>
+                    <details class="app-card-desc-toggle">
+                        <summary>What Tool?</summary>
+                        <p>支出登録・精算・帳票印刷・Excel出力・自動保存に対応した経費管理ツール。インストール不要、ブラウザだけで動作。入力データは端末内に自動保存され、帳票/Excel出力で提出・共有もスムーズ。</p>
+                    </details>
                     <div class="app-card-actions">
-                        <a class="btn-primary" href="expense/">開く →</a>
-                        <a class="btn-secondary" href="expense/">使い方</a>
+                        <a class="btn-primary" href="expense/task_expense_20260621_01.html">Go Tool →</a>
                     </div>
                 </div>
                 <div class="app-card-meta">
-                    <span class="version-tag">v_064</span>
-                    <span class="badge badge-live">公開中</span>
+                    <span class="version-tag">Ver.1.0</span>
+                    <span class="badge badge-live">リリース済</span>
                 </div>
             </div>
 
-            <div class="app-grid-empty">今後ここにアプリが追加されます</div>
+            <div class="app-grid-empty">Stay tuned — more tools coming soon.</div>
         </div>
     </main>
+
+    <footer class="portal-footer">
+        <details class="domain-trivia">
+            <summary>豆知識：taskhum.cc の「.cc」って何？</summary>
+            <p>「.cc」は本来ココス諸島（Cocos (Keeling) Islands）の国別ドメイン（ccTLD）。"cc" が "Creative" や "Company" を連想させる響きであることから、世界的に汎用ドメインとして広く使われている。取得しやすく短い点も人気の理由。</p>
+        </details>
+    </footer>
 </body>
 </html>

@@ -10,7 +10,7 @@
         const PAYMENT_METHODS = ['現金', 'クレジットカード', 'PayPay', '楽天ペイ', 'd払い', 'au PAY', '交通系IC', 'その他Pay', 'オンライン決済'];
         const TAX_RATES = ['10', '8']; // 税率（%）。空文字="未分類"。税額計算は未実装（端数仕様は別途決定）
         const ID_PATTERN = /^[A-Za-z0-9_-]+$/; // 精算ID用（HTML属性へ安全に埋め込める文字のみ許可）
-        const FEEDBACK_FORM_URL = 'https://forms.gle/PLACEHOLDER'; // TODO: Googleフォーム作成後にURLを差し替える
+        const FEEDBACK_FORM_URL = 'https://forms.gle/ktzf3B3xfEjy1ToK6';
         const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/; // 日付形式（YYYY-MM-DD）
         const BACKUP_PREFIX = 'expense_db_backup_';
         const CORRUPTED_PREFIX = 'expense_db_corrupted_';
@@ -106,7 +106,6 @@
             renderSavedShops();
             renderSavedKeywords();
             updateShopSuggestions();
-            document.getElementById('date').focus();
 
             // 印刷ヘッダ欄の初期表示（ブラウザの印刷ショートカット等、printTarget経由以外の直接印刷向けフォールバック）
             applyPrintInfo();

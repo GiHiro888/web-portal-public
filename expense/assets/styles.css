@@ -26,10 +26,17 @@
         #entry-card, #unpaid-card, #history-card, #data-card { scroll-margin-top: 80px; }
         .appbar-unpaid { display: flex; align-items: baseline; gap: 8px; background: var(--accent-tint); color: var(--main-color); padding: 10px 22px; border-radius: 999px; font-weight: bold; font-size: 24px; white-space: nowrap; }
         .appbar-unpaid .appbar-label { font-size: 14px; font-weight: normal; color: var(--muted); }
+        .appbar-left { display: flex; flex-direction: column; gap: 2px; }
+        .appbar-home { font-size: 13px; color: var(--muted); text-decoration: none; }
+        .appbar-home:hover { color: var(--main-color); text-decoration: underline; }
 
         .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
         .card { background-color: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 28px; box-shadow: 0 1px 3px rgba(15,23,42,0.06); margin-bottom: 24px; }
         .warning-card { background: var(--warn-bg); border: 1px solid var(--warn-border); border-left: 5px solid var(--warn-color); }
+        .card-upcoming { border-style: dashed; opacity: 0.85; }
+        .upcoming-badge { font-size: 12px; font-weight: bold; color: var(--muted); background: var(--accent-tint); padding: 2px 10px; border-radius: 999px; vertical-align: middle; margin-left: 8px; }
+        .upcoming-desc { color: var(--muted); font-size: 14px; margin: 0 0 14px; }
+        .upcoming-placeholder { border: 1px dashed var(--border); border-radius: 12px; padding: 18px; text-align: center; color: var(--muted); font-size: 14px; }
 
         h2 { font-size: 28px; margin: 0 0 20px; border-left: 5px solid var(--main-color); padding-left: 15px; color: var(--text); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         h3.card-title { font-size: 24px; margin: 0 0 20px; border-left: 5px solid var(--main-color); padding-left: 15px; color: var(--text); }
@@ -140,16 +147,17 @@
 
         .empty-msg { text-align: center; color: #999; padding: 40px; font-style: italic; }
 
-        /* フッター：ご意見リンクを右上に、データ操作ボタンを利用目的別グループで整理 */
-        .footer-head { display: flex; justify-content: flex-end; margin-bottom: 14px; }
-        .footer-head a { color: var(--muted); font-size: 16px; text-decoration: underline; cursor: pointer; }
-        .footer-head a:hover { color: var(--main-color); }
+        /* フッター：データ操作ボタンを利用目的別グループで整理 */
         .footer-groups { display: flex; flex-direction: column; gap: 18px; }
         .footer-group-label { font-size: 14px; color: var(--muted); margin-bottom: 8px; }
         .footer-tools { display: flex; gap: 10px; flex-wrap: wrap; }
 
         /* 使い方ボタン */
         .manual-btn { font-size: 14px; font-weight: 600; padding: 8px 16px; background: var(--main-color); border: none; border-radius: 999px; color: #fff; cursor: pointer; white-space: nowrap; box-shadow: 0 1px 3px rgba(79,70,229,0.3); }
+
+        /* ご意見・ご要望（ヘッダー常時表示） */
+        .feedback-link { font-size: 14px; color: var(--main-color); text-decoration: underline; cursor: pointer; white-space: nowrap; }
+        .feedback-link:hover { color: var(--main-hover); }
         .manual-btn:hover { background: var(--main-hover); }
 
         /* マニュアルモーダル内レイアウト */
@@ -356,7 +364,7 @@
 
             /* 操作系UIは印刷物に含めない */
             button, input[type="checkbox"], .close-btn, .help-details, .scroll-hint,
-            .select-actions, .footer-head, .footer-groups, #edit-mode-indicator,
+            .select-actions, .footer-groups, #edit-mode-indicator,
             .detail-row-action, .no-print {
                 display: none !important;
             }
